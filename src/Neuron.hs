@@ -10,6 +10,9 @@ import Data.Type.Natural
 import Data.Vector.Sized
 import AutoDiff
 
+scaleVector :: Num a => a -> Vector a n -> Vector a n
+scaleVector x = map (* x)
+
 type Bias          = Double
 type Weights     n = Vector Double n
 type DualWeights n = Vector (Dual Double) n
@@ -31,7 +34,7 @@ biasedWeights neuron = (neuron ^. bias) :- (neuron ^. weights)
 -- type ErrorFunction = Vector Double n -> Vector Double n -> Dual Double
 
 standartError :: Vector Output n -> Vector Output n -> Double
-standartError expected actual = foldl (+) 0 $ map ((/2) . (^2)) $ zipWith (-) expected actual
+standartError expected actual = (/2) . foldl (+) 0 $ map (^2) $ zipWith (-) expected actual
 
 runNeuron :: Neuron n -> Vector Double n -> Double
 runNeuron neuron = val . (neuron ^. activation) . ((neuron ^. summation $ map constDual $ neuron ^. weights) $ constDual $ neuron ^. bias)
@@ -43,11 +46,14 @@ data Example n where
 
 makeLenses ''Example
 
-{-
-teach :: Neuron -> Double -> Vector Example -> ErrorFunction -> Neuron
-teach neuron learnRate examples err = let updated = updateWeights neuron learnRate examples in if fst updated then snd updated else updateWeights (snd updated) learnRate examples
-    where updateWeights :: Neuron -> Double -> Examples -> ErrorFunction -> (Bool, Neuron)
-          updateWeights neuron learnRate examples err
-            | null examples = (True, Neuron)
-            | runNeuron neuron (head examples ^. input) == (head examples ^. output) = updateWeights neuron learnRate $ tail examples
-            | otherwise = (False, snd $ updateWeights (neuron %~ weights %~ (- (learnRate * grad (err $ head examples )))) learnRate) -}
+type LearnRate = Double
+
+updateNeuron :: Neuron n -> (Vector Double (S n) -> Vector Double (S n)) -> Neuron n
+updateNeuron neuron f = let result = f $ (neuron ^. bias) :- (neuron ^. weights) in (neuron & bias .~ (head result)) & weights .~ (tail result)
+
+gradientableError :: Neuron n -> (Vector (Dual Output) m -> Vector (Dual Output) m -> Dual Double) -> Vector (Example n) m -> (Vector (Dual Double) (S n) -> Dual Double)
+gradientableError neuron err examples ws = err (map (constDual . (^. output)) examples) $ map ((neuron ^. activation) . (neuron ^. summation) (tail ws) (head ws) . (^. input)) examples
+
+teach :: Neuron n -> LearnRate -> Vector (Example n) m -> (Vector (Dual Output) m -> Vector (Dual Output) m -> Dual Double) -> Neuron n
+teach neuron learnRate examples err = if (updatedNeuron ^. bias == neuron ^. bias) && (updatedNeuron ^. weights == neuron ^. weights) then neuron else teach updatedNeuron learnRate examples err
+    where updatedNeuron = updateNeuron neuron $ grad $ gradientableError neuron err examples
