@@ -61,7 +61,7 @@ d f = \x -> diff . f $ Dual x 1
 imap :: (Int -> a -> b) -> Vector a n -> Vector b n
 imap f v = indexedMap 0 f v
     where indexedMap :: Int -> (Int -> a -> b) -> Vector a n -> Vector b n
-          indexedMap _ _ Nil       = Nil :: Vector b Z
+          indexedMap _ _ Nil       = Nil
           indexedMap n f (x :- xs) = f n x :- indexedMap (n+1) f xs
 
 grad :: Num a => (Vector (Dual a) n -> (Dual a)) -> Vector a n -> Vector a n

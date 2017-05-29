@@ -28,7 +28,9 @@ test-suite neuralhaskell-test
   hs-source-dirs:      test
   main-is:             Spec.hs
   build-depends:       base
-                     , db
+                     , neuralhaskell
+                     , type-natural == 0.4.2.0
+                     , sized-vector
                      , hspec
                      , QuickCheck
   other-modules:     
