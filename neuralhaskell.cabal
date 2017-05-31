@@ -18,7 +18,6 @@ library
                      , Network
                      , Neuron
                      , Neuron.Model
-                     , Neuron.Perceptron
   build-depends:       base >= 4.7 && < 5
                      , sized-vector
                      , type-natural == 0.4.2.0
