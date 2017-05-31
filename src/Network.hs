@@ -33,6 +33,9 @@ data StopCriteria = StopCriteria { _maxError     :: Error
 
 makeLenses ''StopCriteria
 
+doubleMap :: (a -> b -> c) -> Vector a n -> Vector b n -> Vector c n
+doubleMap f v1 v2 = map (uncurry f) $ zipWithSame (,) v1 v2
+
 shouldStop :: Either StopCriteria (Either Error Iterations) -> Error -> Iterations -> Bool
 shouldStop (Left criteria)   err iter = (criteria ^. maxError) >= err || (criteria ^. maxIteration) <= iter
 shouldStop (Right (Left m))  err _    = m >= err
