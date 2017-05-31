@@ -1,0 +1,40 @@
+name:                neuralhaskell
+version:             0.1.0.0
+homepage:            https://gitlab.com/gleb_dianov/neural-haskell
+license:             BSD3
+license-file:        LICENSE
+author:              Gleb Dianov
+maintainer:          gleb.dianov@utcreading.org.uk
+copyright:           2017 Gleb Dianov
+category:            Library
+build-type:          Simple
+extra-source-files:  README.md
+cabal-version:       >=1.10
+
+library
+  hs-source-dirs:      src
+  ghc-options:         -O2
+  exposed-modules:     AutoDiff
+                     , Neuron
+  build-depends:       base >= 4.7 && < 5
+                     , sized-vector
+                     , type-natural == 0.4.2.0
+                     , transformers
+                     , lens
+  default-language:    Haskell2010
+
+test-suite db-test
+  type:                exitcode-stdio-1.0
+  hs-source-dirs:      test
+  main-is:             Spec.hs
+  build-depends:       base
+                     , db
+                     , hspec
+                     , QuickCheck
+  other-modules:     
+  ghc-options:         -O1 -threaded -rtsopts -with-rtsopts=-N
+  default-language:    Haskell2010
+
+source-repository head
+  type:     git
+  location: https://gitlab.com/gleb_dianov/haskell-database
