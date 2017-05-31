@@ -25,13 +25,18 @@ runNetwork :: Network i l o -> Vector Double i -> Vector Double o
 runNetwork NilNetwork          inputs = inputs
 runNetwork (layer :~~ netTail) inputs = runNetwork netTail $ map (\n -> val $ (n ^. activation) $ (n ^. summation) (map constDual $ n ^. weights) (constDual $ n ^. bias) inputs) layer
 
-type MaxError     = Double
+type Error        = Double
 type Iterations   = Int
-data StopCriteria = StopCriteria { _maxError  :: MaxError
-                                 , _iteration :: Iterations
+data StopCriteria = StopCriteria { _maxError     :: Error
+                                 , _maxIteration :: Iterations
                                  }
 
 makeLenses ''StopCriteria
 
--- teachNetwork :: ErrorFunction m -> LearningRate -> Vector (Example i) m -> Network i l o -> Either StopCriteria (Either MaxError Iterations) -> NetowrkArgs i l o -> NetworkArgs i l o
+shouldStop :: Either StopCriteria (Either Error Iterations) -> Error -> Iterations -> Bool
+shouldStop (Left criteria)   err iter = (criteria ^. maxError) >= err || (criteria ^. maxIteration) <= iter
+shouldStop (Right (Left m))  err _    = m >= err
+shouldStop (Right (Right i)) _   iter = i <= iter
+
+-- teachNetwork :: ErrorFunction m -> LearningRate -> Vector (Example i) m -> Network i l o -> Either StopCriteria (Either Error Iterations) -> NetowrkArgs i l o -> NetworkArgs i l o
 -- teachNetwork err learnRate examples stopCriteria network args = 
