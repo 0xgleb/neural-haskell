@@ -62,12 +62,9 @@ updateNetwork layer (nextL :~~ netTail) errF rate inputs expected = let curErr =
 
 teach :: l ~ S l' => (Vector (Vector Double o) m -> Vector (Vector Double o) m -> Double) -> ErrorFunction o -> LearningRate -> Vector (Example i o) m -> Either StopCriteria (Either Error Iterations) -> Network i l o -> Network i l o
 teach totalErr errF rate examples stopCriteria network = teachNetwork network 0
-    where -- teachNetwork :: Network i l o -> Iterations -> Network i l o
-          teachNetwork net i
+    where teachNetwork net i
             | not $ shouldStop stopCriteria (networkError net) i = teachNetwork (foldl updateNetworkHelper net examples) (i + 1)
             | otherwise = net
 
           networkError net = totalErr (map (runNetwork net . (^. input)) examples) $ map (^. output) examples
-
-          -- updateNetworkHelper :: Network i l o -> Example i o -> Network i l o
           updateNetworkHelper net@(layer :~~ netTail) example = if example ^. output == runNetwork net (example ^. input) then net else snd $ updateNetwork layer netTail errF rate (example ^. input) (example ^. output)
