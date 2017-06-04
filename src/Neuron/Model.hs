@@ -40,15 +40,16 @@ standartError = ErrorFunction $ \actual expected -> (/2) . foldl (+) 0 $ map (^2
 runNeuron :: Neuron n -> Vector Double n -> Double
 runNeuron neuron = val . (neuron ^. activation) . ((neuron ^. summation $ map constDual $ neuron ^. weights) $ constDual $ neuron ^. bias)
 
-data Example n where
-    Example :: { _input  :: Vector Double n
-               , _output :: Output
-               } -> Example n
+data Example i o where
+    Example :: { _input  :: Vector Double i
+               , _output :: Vector Output o
+               } -> Example i o
 
 makeLenses ''Example
 
 type LearningRate = Double
 
+{-
 updateNeuron :: Neuron n -> LearningRate -> (Vector Double (S n) -> Vector Double (S n)) -> Neuron n
 updateNeuron neuron learnRate f = let result = scaleVector learnRate $ f $ (neuron ^. bias) :- (neuron ^. weights) in (neuron & bias .~ (head result)) & weights .~ (tail result)
 
@@ -59,3 +60,4 @@ teach :: ErrorFunction m -> LearningRate -> Vector (Example n) m -> Neuron n -> 
 teach err learnRate examples neuron = if (abs ((updatedNeuron ^. bias) - (neuron ^. bias)) < (learnRate / 100)) && (modulus (zipWith (-) (updatedNeuron ^. weights) (neuron ^. weights)) < (learnRate / 100)) then neuron else teach err learnRate examples updatedNeuron
     where updatedNeuron = updateNeuron neuron learnRate $ grad $ gradientableError neuron err examples
           modulus = sqrt . sum . map (^2)
+-}
