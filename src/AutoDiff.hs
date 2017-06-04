@@ -1,18 +1,26 @@
 {-# LANGUAGE TypeFamilies, DataKinds #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE StandaloneDeriving #-}
 
 module AutoDiff 
 ( Dual(..)
 , constDual
 , d
 , grad
+, imap
+, toNormalFunc
 ) where
 
 import Data.Vector.Sized
 import Data.Type.Natural
 
-data Dual a = Dual { val  :: a
-                   , diff :: a
-                   } deriving (Eq, Read, Show)
+data Dual a where
+    Dual :: Num a => { val  :: a
+                     , diff :: a
+                     } -> Dual a
+                     
+deriving instance Eq a => Eq (Dual a)
+deriving instance Show a => Show (Dual a)
 
 constDual :: Num a => a -> Dual a
 constDual x = Dual x 0
@@ -63,6 +71,9 @@ imap f v = indexedMap 0 f v
     where indexedMap :: Int -> (Int -> a -> b) -> Vector a n -> Vector b n
           indexedMap _ _ Nil       = Nil
           indexedMap n f (x :- xs) = f n x :- indexedMap (n+1) f xs
+
+toNormalFunc :: (Num a, Num b) => (Dual a -> Dual b) -> a -> b
+toNormalFunc f = val . f . constDual
 
 grad :: Num a => (Vector (Dual a) n -> (Dual a)) -> Vector a n -> Vector a n
 grad f = \v -> imap (\i _ -> diff $ f $ toDualVector v i) v

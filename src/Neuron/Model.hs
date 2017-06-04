@@ -35,7 +35,7 @@ data ErrorFunction m where
     ErrorFunction :: { unErrF :: Vector (Dual Output) m -> Vector (Dual Output) m -> Dual Double } -> ErrorFunction m
 
 standartError :: ErrorFunction n
-standartError = ErrorFunction $ \expected actual -> (/2) . foldl (+) 0 $ map (^2) $ zipWith (-) expected actual
+standartError = ErrorFunction $ \actual expected -> (/2) . foldl (+) 0 $ map (^2) $ zipWith (-) actual expected
 
 runNeuron :: Neuron n -> Vector Double n -> Double
 runNeuron neuron = val . (neuron ^. activation) . ((neuron ^. summation $ map constDual $ neuron ^. weights) $ constDual $ neuron ^. bias)
