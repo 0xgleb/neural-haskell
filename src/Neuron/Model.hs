@@ -47,15 +47,15 @@ data Example n where
 
 makeLenses ''Example
 
-type LearnRate = Double
+type LearningRate = Double
 
-updateNeuron :: Neuron n -> LearnRate -> (Vector Double (S n) -> Vector Double (S n)) -> Neuron n
+updateNeuron :: Neuron n -> LearningRate -> (Vector Double (S n) -> Vector Double (S n)) -> Neuron n
 updateNeuron neuron learnRate f = let result = scaleVector learnRate $ f $ (neuron ^. bias) :- (neuron ^. weights) in (neuron & bias .~ (head result)) & weights .~ (tail result)
 
 gradientableError :: Neuron n -> ErrorFunction m -> Vector (Example n) m -> (Vector (Dual Double) (S n) -> Dual Double)
 gradientableError neuron err examples ws = unErrF err (map (constDual . (^. output)) examples) $ map ((neuron ^. activation) . (neuron ^. summation) (tail ws) (head ws) . (^. input)) examples
 
-teach :: ErrorFunction m -> LearnRate -> Vector (Example n) m -> Neuron n -> Neuron n
+teach :: ErrorFunction m -> LearningRate -> Vector (Example n) m -> Neuron n -> Neuron n
 teach err learnRate examples neuron = if (abs ((updatedNeuron ^. bias) - (neuron ^. bias)) < (learnRate / 100)) && (modulus (zipWith (-) (updatedNeuron ^. weights) (neuron ^. weights)) < (learnRate / 100)) then neuron else teach err learnRate examples updatedNeuron
     where updatedNeuron = updateNeuron neuron learnRate $ grad $ gradientableError neuron err examples
           modulus = sqrt . sum . map (^2)
