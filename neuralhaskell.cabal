@@ -16,13 +16,25 @@ library
   ghc-options:         -O2
   exposed-modules:     AutoDiff
                      , Network
-                     , Neuron
-                     , Neuron.Model
+                     , Network.Types
+                     , Network.Neuron
   build-depends:       base >= 4.7 && < 5
                      , sized-vector
                      , type-natural == 0.4.2.0
                      , transformers
-                     , lens
+                     , lens == 4.15.1
+  default-language:    Haskell2010
+
+executable neuralhaskell
+  hs-source-dirs:      app
+  main-is:             Main.hs
+  ghc-options:         -O2 -threaded -rtsopts -with-rtsopts=-N
+  build-depends:       base
+                     , random
+                     , type-natural == 0.4.2.0
+                     , sized-vector
+                     , lens == 4.15.1
+                     , neuralhaskell
   default-language:    Haskell2010
 
 test-suite neuralhaskell-test

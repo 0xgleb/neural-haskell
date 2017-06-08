@@ -1,7 +1,17 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE DataKinds, GADTs #-}
 
-module Neuron.Model where
+module Network.Neuron
+( Neuron(..)
+, summation
+, activation
+, weights
+, bias
+, scaleVector
+, biasedWeights
+, squareError
+, runNeuron
+) where
 
 import Control.Lens
 
@@ -10,44 +20,28 @@ import Data.Type.Natural
 import Data.Vector.Sized
 import AutoDiff
 
-scaleVector :: Num a => a -> Vector a n -> Vector a n
-scaleVector x = map (* x)
-
-type Bias          = Double
-type Weights     n = Vector Double n
-type DualWeights n = Vector (Dual Double) n
-type Activations n = Vector Double n
-type Output        = Double
+import Network.Types
 
 data Neuron n where
     Neuron :: { _summation  :: DualWeights n -> Dual Bias -> Activations n -> Dual Output
-              , _activation :: Dual Double -> Dual Output
+              , _activation :: Dual Output -> Dual Output
               , _weights    :: Weights n
               , _bias       :: Bias
               } -> Neuron n
 
 makeLenses ''Neuron
 
+scaleVector :: Num a => a -> Vector a n -> Vector a n
+scaleVector x = map (* x)
+
 biasedWeights :: Neuron n -> Weights (S n)
 biasedWeights neuron = (neuron ^. bias) :- (neuron ^. weights)
 
-data ErrorFunction m where
-    ErrorFunction :: { unErrF :: Vector (Dual Output) m -> Vector (Dual Output) m -> Dual Double } -> ErrorFunction m
+squareError :: ErrorFunction n
+squareError = ErrorFunction $ \actual expected -> (/2) $ sum $ map (^2) $ zipWith (-) actual expected
 
-standartError :: ErrorFunction n
-standartError = ErrorFunction $ \actual expected -> (/2) . foldl (+) 0 $ map (^2) $ zipWith (-) actual expected
-
-runNeuron :: Neuron n -> Vector Double n -> Double
+runNeuron :: Neuron n -> Vector Input n -> Output
 runNeuron neuron = val . (neuron ^. activation) . ((neuron ^. summation $ map constDual $ neuron ^. weights) $ constDual $ neuron ^. bias)
-
-data Example i o where
-    Example :: { _input  :: Vector Double i
-               , _output :: Vector Output o
-               } -> Example i o
-
-makeLenses ''Example
-
-type LearningRate = Double
 
 {-
 updateNeuron :: Neuron n -> LearningRate -> (Vector Double (S n) -> Vector Double (S n)) -> Neuron n
