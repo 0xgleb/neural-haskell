@@ -51,7 +51,7 @@ toNetwork :: (i ~ S i', o ~ S o') => Vector (Neuron i) o -> Network i (S Z) o
 toNetwork layer = layer :~~ NilNetwork
 
 getTotalError :: ErrorFunction o -> TotalErrorFunction m o
-getTotalError errF = TotalErrorFunction $ \v1 v2 -> val $ (/ fromIntegral (length v1)) $ sum $ zipWith (unErrF errF) (map (map constDual) v1) (map (map constDual) v2)
+getTotalError errF = TotalErrorFunction $ \v1 v2 -> val $ sum $ zipWith (unErrF errF) (map (map constDual) v1) (map (map constDual) v2)
 
 dAct :: Vector (Neuron i) o -> Vector Input i -> Vector Output o
 dAct layer inputs = map (\n -> d (n ^. activation) $ (nonDiffSum $ n ^. summation) (n ^. weights) (n ^. bias) inputs) layer
