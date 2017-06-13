@@ -53,4 +53,4 @@ test-suite neuralhaskell-test
 
 source-repository head
   type:     git
-  location: https://gitlab.com/gleb_dianov/haskell-database
+  location: https://gitlab.com/gleb_dianov/neural-haskell
