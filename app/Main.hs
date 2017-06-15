@@ -1,17 +1,19 @@
+{-# LANGUAGE DataKinds #-}
+
 import Prelude hiding ((!!), (++), head, tail, foldl, foldr, zipWith, map, sum)
-import Data.Type.Natural
-import Data.Vector.Sized
+import Data.Vector.Sized hiding (replicateM)
+import GHC.TypeLits
 
 import System.Random
 import Control.Monad
-import Control.Lens
+import Control.Lens hiding (cons)
 
 import AutoDiff
 import Network.Types
 import Network
 
-summ :: Num a => Vector (Dual a) n -> (Dual a) -> Vector a n -> Dual a
-summ ws b a = (+ b) $ sum $ zipWithSame (*) ws $ map constDual a
+summ :: Num a => Vector n (Dual a) -> (Dual a) -> Vector n a -> Dual a
+summ ws b a = (+ b) $ sum $ zipWith (*) ws $ map constDual a
 
 logistic :: Floating a => a -> a
 logistic x = 1 / (1 + exp (-x))
@@ -22,21 +24,21 @@ logisticNeuron = Neuron summ logistic
 linearNeuron :: Weights n -> Bias -> Neuron n
 linearNeuron = Neuron summ id
 
-testNet :: [Number] -> [Bias] -> [Number] -> Number -> Network Two Two One
+testNet :: [Number] -> [Bias] -> [Number] -> Number -> Network 2 2 1
 testNet [w11, w12, w21, w22, w31, w32, w41, w42] [b1, b2, b3, b4] [w1, w2, w3, w4] b = 
-    (logisticNeuron (w11 :- w12 :- Nil) b1
-  :- logisticNeuron (w21 :- w22 :- Nil) b2
-  :- logisticNeuron (w31 :- w32 :- Nil) b3
-  :- logisticNeuron (w41 :- w42 :- Nil) b4
-  :- Nil) :~~ (logisticNeuron (w1 :- w2 :- w3 :- w4 :- Nil) b :- Nil) :~~ NilNetwork
+    (cons (logisticNeuron (cons w11 $ cons w12 empty) b1)
+   $ cons (logisticNeuron (cons w21 $ cons w22 empty) b2)
+   $ cons (logisticNeuron (cons w31 $ cons w32 empty) b3)
+   $ cons (logisticNeuron (cons w41 $ cons w42 empty) b4)
+   $ empty) :~~ (cons (logisticNeuron (cons w1 $ cons w2 $ cons w3 $ cons w4 empty) b) empty) :~~ NilNetwork
 
-examples = (Example (0 :- 0 :- Nil) (0 :- Nil))
-        :- (Example (0 :- 1 :- Nil) (1 :- Nil))
-        :- (Example (1 :- 0 :- Nil) (1 :- Nil))
-        :- (Example (1 :- 1 :- Nil) (0 :- Nil))
-        :- Nil
+examples = cons (Example (cons 0 $ cons 0 empty) (singleton 0))
+         $ cons (Example (cons 0 $ cons 1 empty) (singleton 1))
+         $ cons (Example (cons 1 $ cons 0 empty) (singleton 1))
+         $ cons (Example (cons 1 $ cons 1 empty) (singleton 0))
+         $ empty
 
-initNet :: IO (Network Two Two One)
+initNet :: IO (Network 2 2 1)
 initNet = (liftM testNet $ replicateM 8 (randomIO :: IO Number)) <*> replicateM 4 (randomIO :: IO Number) <*> replicateM 4 (randomIO :: IO Number) <*> (randomIO :: IO Number)
 
 main :: IO ()

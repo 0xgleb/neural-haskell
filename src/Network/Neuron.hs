@@ -1,5 +1,6 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE DataKinds, GADTs #-}
+{-# LANGUAGE TypeOperators #-}
 
 module Network.Neuron
 ( Neuron(..)
@@ -13,11 +14,11 @@ module Network.Neuron
 , runNeuron
 ) where
 
-import Control.Lens
+import Control.Lens hiding (cons)
 
 import Prelude hiding ((++), head, tail, foldl, zipWith, map, sum)
-import Data.Type.Natural
 import Data.Vector.Sized
+import GHC.TypeLits
 import AutoDiff
 
 import Network.Types
@@ -31,16 +32,16 @@ data Neuron n where
 
 makeLenses ''Neuron
 
-scaleVector :: Num a => a -> Vector a n -> Vector a n
+scaleVector :: Num a => a -> Vector n a -> Vector n a
 scaleVector x = map (* x)
 
-biasedWeights :: Neuron n -> Weights (S n)
-biasedWeights neuron = (neuron ^. bias) :- (neuron ^. weights)
+biasedWeights :: Neuron n -> Weights (n + 1)
+biasedWeights neuron = (neuron ^. bias) `cons` (neuron ^. weights)
 
 squareError :: ErrorFunction n
 squareError = ErrorFunction $ \actual expected -> (/2) $ sum $ map (^2) $ zipWith (-) actual expected
 
-runNeuron :: Neuron n -> Vector Input n -> Output
+runNeuron :: Neuron n -> Vector n Input -> Output
 runNeuron neuron = val . (neuron ^. activation) . ((neuron ^. summation $ map constDual $ neuron ^. weights) $ constDual $ neuron ^. bias)
 
 {-

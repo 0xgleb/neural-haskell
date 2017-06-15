@@ -3,13 +3,4 @@ extra-package-dbs: []
 packages:
 - .
 extra-deps:
-- approximate-equality-1.1.0.2
-- constraints-0.8
-- equational-reasoning-0.4.1.1
-- ghc-typelits-natnormalise-0.4.6
-- ghc-typelits-presburger-0.1.1.0
-- monomorphic-0.0.3.3
-- sized-vector-1.4.3.1
-- type-level-natural-number-2.0
-- type-natural-0.4.2.0
 resolver: lts-8.16

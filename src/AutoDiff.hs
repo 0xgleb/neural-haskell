@@ -12,7 +12,7 @@ module AutoDiff
 ) where
 
 import Data.Vector.Sized
-import Data.Type.Natural
+import GHC.TypeLits
 
 data Dual a where
     Dual :: Num a => { val  :: a
@@ -66,15 +66,9 @@ instance Ord a => Ord (Dual a) where
 d :: (Num a, Num c) => (Dual a -> Dual c) -> a -> c
 d f = \x -> diff . f $ Dual x 1
 
-imap :: (Int -> a -> b) -> Vector a n -> Vector b n
-imap f v = indexedMap 0 f v
-    where indexedMap :: Int -> (Int -> a -> b) -> Vector a n -> Vector b n
-          indexedMap _ _ Nil       = Nil
-          indexedMap n f (x :- xs) = f n x :- indexedMap (n+1) f xs
-
 toNormalFunc :: (Num a, Num b) => (Dual a -> Dual b) -> a -> b
 toNormalFunc f = val . f . constDual
 
-grad :: Num a => (Vector (Dual a) n -> (Dual a)) -> Vector a n -> Vector a n
+grad :: Num a => (Vector n (Dual a) -> Dual a) -> Vector n a -> Vector n a
 grad f = \v -> imap (\i _ -> diff $ f $ toDualVector v i) v
     where toDualVector v i = imap (\index value -> if index == i then Dual value 1 else Dual value 0) v
