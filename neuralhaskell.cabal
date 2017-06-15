@@ -26,7 +26,7 @@ library
 executable neuralhaskell
   hs-source-dirs:      app
   main-is:             Main.hs
-  ghc-options:         -O2 -threaded -rtsopts -with-rtsopts=-N
+  ghc-options:         -O2 -threaded
   build-depends:       base
                      , random
                      , vector-sized == 0.5.1.0
