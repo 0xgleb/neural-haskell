@@ -68,8 +68,6 @@ for j in range(60000):
     
     # Back propagation of errors using the chain rule. 
     l2_error = y - l2
-    if(j % 10000) == 0:   # Only print the error every 10000 steps, to save time and limit the amount of output. 
-        print("Error: " + str(np.mean(np.abs(l2_error))))
         
     l2_delta = l2_error*nonlin(l2, deriv=True)
     
