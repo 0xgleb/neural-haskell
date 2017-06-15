@@ -11,7 +11,7 @@ module Network
 , shouldStop
 , toNetwork
 , getTotalError
-, teach
+, train
 ) where
 
 import Prelude hiding ((!!), (++), head, tail, foldl, zipWith, map, sum, length)
@@ -25,40 +25,49 @@ import AutoDiff
 import Network.Types
 import Network.Neuron
 
+
 infixr 5 :~~
 
 data Network inputs layers outputs where
     NilNetwork :: (NZ i i') => Network i 0 i
     (:~~)      :: (NZ i i', NZ o o', NZ m m') => Vector i (Neuron m) -> Network i l o -> Network m (l + 1) o
 
+
 nonDiffSum :: (DualWeights n -> Dual Bias -> Activations n -> Dual Output) -> Weights n -> Bias -> Activations n -> Output
 nonDiffSum summ w b i = val $ summ (map constDual w) (constDual b) i
+
 
 runNetwork :: Network i l o -> Vector i Input -> Vector o Output
 runNetwork NilNetwork          inputs = inputs
 runNetwork (layer :~~ netTail) inputs = runNetwork netTail $ map (\n -> (toNormalFunc $ n ^. activation) $ (nonDiffSum $ n ^. summation) (n ^. weights) (n ^. bias) inputs) layer
 
+
 doubleMap :: (a -> b -> c) -> Vector n a -> Vector n b -> Vector n c
 doubleMap f v1 v2 = map (uncurry f) $ zipWith (,) v1 v2
+
 
 shouldStop :: Either StopCriteria (Either Error Iterations) -> Error -> Iterations -> Bool
 shouldStop (Left criteria)   err iter = (criteria ^. maxError) >= err || (criteria ^. maxIteration) <= iter
 shouldStop (Right (Left m))  err _    = m >= err
 shouldStop (Right (Right i)) _   iter = i <= iter
 
+
 toNetwork :: (NZ i i', NZ o o') => Vector o (Neuron i) -> Network i 1 o
 toNetwork layer = layer :~~ NilNetwork
+
 
 getTotalError :: ErrorFunction o -> TotalErrorFunction m o
 getTotalError errF = TotalErrorFunction $ \v1 v2 -> val $ sum $ zipWith (unErrF errF) (map (map constDual) v1) (map (map constDual) v2)
 
+
 dAct :: Vector o (Neuron i) -> Vector i Input -> Vector o Output
 dAct layer inputs = map (\n -> d (n ^. activation) $ (nonDiffSum $ n ^. summation) (n ^. weights) (n ^. bias) inputs) layer
+
 
 updateLayer :: Vector o (Neuron i) -> Vector i Input -> Vector o Error -> LearningRate -> Vector o (Neuron i)
 updateLayer layer inputs curErr rate = doubleMap updNeuron layer curErr
     where updNeuron n e = n & weights %~ (\ws -> zipWith (\p n -> p - rate * n) ws $ scaleVector e inputs) & bias %~ (\b -> b - rate * e)
--- where updNeuron n e = n & weights %~ (\ws -> zipWith (\p n -> p - rate * n) ws $ scaleVector e inputs) & weights %~ trace "updated weights" & bias %~ (\b -> b - rate * e) & bias %~ trace "updates bias"
+
 
 updateNetwork :: (NZ m m', NZ i i') => Vector i (Neuron m) -> Network i l o -> ErrorFunction o -> LearningRate -> Vector m Input -> Vector o Output -> (Vector i Error, Network m (l + 1) o)
 updateNetwork layer NilNetwork errF rate inputs expected = (curErr, toNetwork $ updateLayer layer inputs curErr rate)
@@ -70,10 +79,9 @@ updateNetwork layer (nextL :~~ netTail) errF rate inputs expected = (curErr, upd
           multiply errors ws = (\v -> foldl (doubleMap (+)) (head v) (tail v)) $ doubleMap scaleVector errors ws
           atNextLayer = updateNetwork nextL netTail errF rate (runNetwork (toNetwork layer) inputs) expected
 
-teach :: (NZ l l') => ErrorFunction o -> LearningRate -> Vector m (Example i o) -> Either StopCriteria (Either Error Iterations) -> Network i l o -> Network i l o
-teach errF rate examples stopCriteria network = teachNetwork network 0
-    where teachNetwork net i
-            | shouldStop stopCriteria (networkError net) i = net
-            | otherwise = teachNetwork (foldl (\(layer :~~ netTail) e -> snd $ updateNetwork layer netTail errF rate (e ^. input) (e ^. output)) net examples) (i + 1)
 
-          networkError net = unTotErrF (getTotalError errF) (map (runNetwork net . (^. input)) examples) $ map (^. output) examples
+train :: (NZ l l') => ErrorFunction o -> LearningRate -> Vector m (Example i o) -> Either StopCriteria (Either Error Iterations) -> Network i l o -> Network i l o
+train errF rate examples stopCriteria network = trainNetwork network 0
+    where trainNetwork net i
+            | shouldStop stopCriteria (unTotErrF (getTotalError errF) (map (runNetwork net . (^. input)) examples) $ map (^. output) examples) i = net
+            | otherwise = trainNetwork (foldl (\(layer :~~ netTail) e -> snd $ updateNetwork layer netTail errF rate (e ^. input) (e ^. output)) net examples) (i + 1)

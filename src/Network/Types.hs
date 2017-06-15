@@ -30,11 +30,14 @@ data StopCriteria  = StopCriteria { _maxError     :: Error
 
 makeLenses ''StopCriteria
 
+
 data ErrorFunction m where
     ErrorFunction :: { unErrF :: Vector m (Dual Output) -> Vector m (Dual Output) -> Dual Number } -> ErrorFunction m
 
+
 data TotalErrorFunction m o where
     TotalErrorFunction :: { unTotErrF :: Vector m (Vector o Output) -> Vector m (Vector o Output) -> Output } -> TotalErrorFunction m o
+
 
 data Example i o where
     Example :: { _input  :: Vector i Number
@@ -42,5 +45,6 @@ data Example i o where
                } -> Example i o
 
 makeLenses ''Example
+
 
 type LearningRate = Number

@@ -44,5 +44,5 @@ initNet = (liftM testNet $ replicateM 8 (randomIO :: IO Number)) <*> replicateM 
 
 main :: IO ()
 main = do
-    smartNet <- teach squareError 1 examples (Right $ Right 60000) <$> initNet
+    smartNet <- train squareError 1 examples (Right $ Right 60000) <$> initNet
     foldr ((>>) . print . round . head . runNetwork smartNet . (^. input)) mempty examples

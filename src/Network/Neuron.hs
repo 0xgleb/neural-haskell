@@ -23,6 +23,7 @@ import AutoDiff
 
 import Network.Types
 
+
 data Neuron n where
     Neuron :: { _summation  :: DualWeights n -> Dual Bias -> Activations n -> Dual Output
               , _activation :: Dual Output -> Dual Output
@@ -32,14 +33,18 @@ data Neuron n where
 
 makeLenses ''Neuron
 
+
 scaleVector :: Num a => a -> Vector n a -> Vector n a
 scaleVector x = map (* x)
+
 
 biasedWeights :: Neuron n -> Weights (n + 1)
 biasedWeights neuron = (neuron ^. bias) `cons` (neuron ^. weights)
 
+
 squareError :: ErrorFunction n
 squareError = ErrorFunction $ \actual expected -> (/2) $ sum $ map (^2) $ zipWith (-) actual expected
+
 
 runNeuron :: Neuron n -> Vector n Input -> Output
 runNeuron neuron = val . (neuron ^. activation) . ((neuron ^. summation $ map constDual $ neuron ^. weights) $ constDual $ neuron ^. bias)
