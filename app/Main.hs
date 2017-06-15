@@ -32,6 +32,7 @@ testNet [w11, w12, w21, w22, w31, w32, w41, w42] [b1, b2, b3, b4] [w1, w2, w3, w
    $ cons (logisticNeuron (cons w41 $ cons w42 empty) b4)
    $ empty) :~~ (cons (logisticNeuron (cons w1 $ cons w2 $ cons w3 $ cons w4 empty) b) empty) :~~ NilNetwork
 
+examples :: Vector 4 (Example 2 1)
 examples = cons (Example (cons 0 $ cons 0 empty) (singleton 0))
          $ cons (Example (cons 0 $ cons 1 empty) (singleton 1))
          $ cons (Example (cons 1 $ cons 0 empty) (singleton 1))
