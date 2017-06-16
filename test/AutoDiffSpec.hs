@@ -9,7 +9,6 @@ import Test.Hspec
 import Test.QuickCheck
 
 import AutoDiff
-import Data.Type.Natural
 import Data.Vector.Sized
 
 -- deriving instance Arbitrary (Dual a)
@@ -53,9 +52,9 @@ spec = do
     describe "grad" $ do
         it "can calculate gradients of sum of polynomials of different arguments" $ do
             property $ \x y -> (abs x :: Double) < 1000 && (abs y :: Double) < 1000 ==> 
-                map (floor . abs) (zipWith (-) (grad (\v -> f (head v) + f (last v)) $ x :- y :- Nil) (f' x :- f' y :- Nil)) == (0 :- 0 :- Nil :: Vector Int (S (S Z)))
+                map (floor . abs) (zipWith (-) (grad (\v -> f (head v) + f (last v)) $ cons x $ singleton y) (cons (f' x) $ singleton $ f' y)) == (cons 0 $ singleton 0 :: Vector 2 Int)
         it "can calculate gradients of polynomials" $ do
-            property $ \x y -> (grad (\v -> head v * last v) $ (x :: Double) :- (y :: Double) :- Nil) == y :- x :- Nil
+            property $ \x y -> (grad (\v -> head v * last v) $ cons (x :: Double) $ singleton (y :: Double)) == (y `cons` singleton x)
 
 main :: IO ()
 main = hspec spec
