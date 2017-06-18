@@ -22,7 +22,7 @@ import Data.Vector.Sized
 import GHC.TypeLits
 import AutoDiff
 
-import System.Random
+import System.Random (randomRIO)
 
 import Network.Types
 
@@ -38,7 +38,7 @@ makeLenses ''Neuron
 
 
 initNeuron :: Neuron n -> IO (Neuron n)
-initNeuron (Neuron s a ws b) = (Neuron s a <$> mapM (\_ -> randomIO :: IO Number) ws) <*> (randomIO :: IO Number)
+initNeuron (Neuron s a ws b) = (Neuron s a <$> mapM (\_ -> randomRIO (0, 1) :: IO Number) ws) <*> (randomRIO (0, 1) :: IO Number)
 
 
 scaleVector :: Num a => a -> Vector n a -> Vector n a
