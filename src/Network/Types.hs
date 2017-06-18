@@ -24,6 +24,7 @@ type Input         = Number
 type Output        = Number
 type Error         = Number
 type Iterations    = Integer
+type LearningRate  = Number
 data StopCriteria  = StopCriteria { _maxError     :: Error
                                   , _maxIteration :: Iterations
                                   }
@@ -45,6 +46,3 @@ data Example i o where
                } -> Example i o
 
 makeLenses ''Example
-
-
-type LearningRate = Number

@@ -8,6 +8,7 @@ module Network.Neuron
 , activation
 , weights
 , bias
+, initNeuron
 , scaleVector
 , biasedWeights
 , squareError
@@ -16,10 +17,12 @@ module Network.Neuron
 
 import Control.Lens hiding (cons)
 
-import Prelude hiding ((++), head, tail, foldl, zipWith, map, sum)
+import Prelude hiding ((++), head, tail, foldl, zipWith, map, sum, mapM)
 import Data.Vector.Sized
 import GHC.TypeLits
 import AutoDiff
+
+import System.Random
 
 import Network.Types
 
@@ -32,6 +35,10 @@ data Neuron n where
               } -> Neuron n
 
 makeLenses ''Neuron
+
+
+initNeuron :: Neuron n -> IO (Neuron n)
+initNeuron (Neuron s a ws b) = (Neuron s a <$> mapM (\_ -> randomIO :: IO Number) ws) <*> (randomIO :: IO Number)
 
 
 scaleVector :: Num a => a -> Vector n a -> Vector n a

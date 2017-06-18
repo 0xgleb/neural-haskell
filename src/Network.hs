@@ -6,20 +6,25 @@ module Network
 ( module Network.Neuron
 , Network(..)
 , nonDiffSum
+, initNet
 , runNetwork
 , doubleMap
 , shouldStop
 , toNetwork
 , getTotalError
 , train
+, cvTrain
 ) where
 
-import Prelude hiding ((!!), (++), head, tail, foldl, zipWith, map, sum, length)
+import Prelude hiding ((!!), (++), head, tail, foldl, zipWith, map, sum, length, mapM)
 
 import Data.Vector.Sized
 import GHC.TypeLits
 
 import Control.Lens
+import Control.Monad (liftM2)
+
+import System.Random
 
 import AutoDiff
 import Network.Types
@@ -36,6 +41,9 @@ data Network inputs layers outputs where
 nonDiffSum :: (DualWeights n -> Dual Bias -> Activations n -> Dual Output) -> Weights n -> Bias -> Activations n -> Output
 nonDiffSum summ w b i = val $ summ (map constDual w) (constDual b) i
 
+initNet :: Network i l o -> IO (Network i l o)
+initNet NilNetwork          = return NilNetwork
+initNet (layer :~~ netTail) = liftM2 (:~~) (mapM initNeuron layer) $ initNet netTail
 
 runNetwork :: Network i l o -> Vector i Input -> Vector o Output
 runNetwork NilNetwork          inputs = inputs
@@ -85,3 +93,9 @@ train errF rate examples stopCriteria network = trainNetwork network 0
     where trainNetwork net i
             | shouldStop stopCriteria (unTotErrF (getTotalError errF) (map (runNetwork net . (^. input)) examples) $ map (^. output) examples) i = net
             | otherwise = trainNetwork (foldl (\(layer :~~ netTail) e -> snd $ updateNetwork layer netTail errF rate (e ^. input) (e ^. output)) net examples) (i + 1)
+
+cvTrain :: (NZ l l') => ErrorFunction o -> LearningRate -> Vector m (Example i o) -> Vector n (Example i o) -> Either StopCriteria (Either Error Iterations) -> Network i l o -> Network i l o
+cvTrain errF rate trainingExamples validationExamples stopCriteria network = trainNetwork network 0
+    where trainNetwork net i
+            | shouldStop stopCriteria (unTotErrF (getTotalError errF) (map (runNetwork net . (^. input)) validationExamples) $ map (^. output) validationExamples) i = net
+            | otherwise = trainNetwork (foldl (\(layer :~~ netTail) e -> snd $ updateNetwork layer netTail errF rate (e ^. input) (e ^. output)) net trainingExamples) (i + 1)
