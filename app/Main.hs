@@ -23,5 +23,7 @@ examples = cons (Example (cons 0 $ cons 0 empty) (singleton 0))
 
 main :: IO ()
 main = do
-    smartNet <- train squareError 1 examples (Right $ Right 60000) <$> initNet testNet
-    foldr ((>>) . print . round . head . runNetwork smartNet . (^. input)) mempty examples
+    smartNet <- train quadraticError 1 examples (Left $ StopCriteria 0.00000072 60000) <$> initNet testNet
+    print $ (unTotErrF $ getTotalError quadraticError) (map _output examples) $ map (runNetwork smartNet . _input) examples
+    putStrLn ""
+    foldr ((>>) . print . head . runNetwork smartNet . (^. input)) mempty examples

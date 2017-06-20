@@ -12,7 +12,7 @@ module Network.Neuron
 , initNeuron
 , scaleVector
 , biasedWeights
-, squareError
+, quadraticError
 , runNeuron
 ) where
 
@@ -50,8 +50,8 @@ biasedWeights :: Neuron n -> Weights (n + 1)
 biasedWeights neuron = (neuron ^. bias) `cons` (neuron ^. weights)
 
 
-squareError :: ErrorFunction n
-squareError = ErrorFunction $ \actual expected -> (/2) $ sum $ map (^2) $ zipWith (-) actual expected
+quadraticError :: ErrorFunction n
+quadraticError = ErrorFunction $ \actual expected -> (/2) $ sum $ map (^2) $ zipWith (-) actual expected
 
 
 runNeuron :: Neuron n -> Vector n Input -> Output

@@ -60,7 +60,6 @@ syn1 = 2*np.random.random((4,1)) - 1  # 4x1 matrix of weights. (4 nodes x 1 outp
 # Python2 Note: In the follow command, you may improve 
 #   performance by replacing 'range' with 'xrange'. 
 for j in range(60000):  
-    
     # Calculate forward through the network.
     l0 = X
     l1 = nonlin(np.dot(l0, syn0))
@@ -78,6 +77,8 @@ for j in range(60000):
     # update weights (no learning rate term)
     syn1 += l1.T.dot(l2_delta)
     syn0 += l0.T.dot(l1_delta)
-    
-print("Output after training")
+
+print(str(np.mean(np.square(l2_error))))
+
+print("\nOutput after training")
 print(l2)
