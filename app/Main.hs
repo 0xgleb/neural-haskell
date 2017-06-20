@@ -11,9 +11,6 @@ import AutoDiff
 import Network hiding (replicateM)
 import Network.Neurons
 
-linearNeuron :: Weights n -> Bias -> Neuron n
-linearNeuron = Neuron standartSum id
-
 testNet :: Network 2 2 1
 testNet = (cons logisticNeuron $ cons logisticNeuron $ cons logisticNeuron $ cons logisticNeuron $ empty) :~~ singleton logisticNeuron :~~ NilNetwork
 
