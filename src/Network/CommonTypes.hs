@@ -20,22 +20,22 @@ type Bias          = Number
 type Input         = Number
 type Output        = Number
 
-type Error         = Number
+type Loss          = Number
 type Iterations    = Integer
 type LearningRate  = Number
-data StopCriteria  = StopCriteria { _maxError     :: Error
+data StopCriteria  = StopCriteria { _maxLoss      :: Loss
                                   , _maxIteration :: Iterations
                                   }
 
 makeLenses ''StopCriteria
 
 
-data ErrorFunction m where
-    ErrorFunction :: { unErrF :: Vector m (Dual Output) -> Vector m (Dual Output) -> Dual Number } -> ErrorFunction m
+data LossFunction m where
+    LossFunction :: { unErrF :: Vector m (Dual Output) -> Vector m (Dual Output) -> Dual Number } -> LossFunction m
 
 
-data TotalErrorFunction m o where
-    TotalErrorFunction :: { unTotErrF :: Vector m (Vector o Output) -> Vector m (Vector o Output) -> Output } -> TotalErrorFunction m o
+data TotalLossFunction m o where
+    TotalLossFunction :: { unTotErrF :: Vector m (Vector o Output) -> Vector m (Vector o Output) -> Output } -> TotalLossFunction m o
 
 
 data Example i o where

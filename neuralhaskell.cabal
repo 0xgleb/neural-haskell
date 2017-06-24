@@ -18,6 +18,7 @@ library
                      , Network.Classic.Types
                      , Network.Classic.Neuron
                      , Network.Classic.Neurons
+                     , Network.Classic.Network
                      , Network.Classic
                      , Network.CommonTypes
                      , Network.Convolutional.Types
