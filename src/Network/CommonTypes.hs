@@ -31,11 +31,11 @@ makeLenses ''StopCriteria
 
 
 data LossFunction m where
-    LossFunction :: { unErrF :: Vector m (Dual Output) -> Vector m (Dual Output) -> Dual Number } -> LossFunction m
+    LossFunction :: { unLossF :: Vector m (Dual Output) -> Vector m (Dual Output) -> Dual Number } -> LossFunction m
 
 
 data TotalLossFunction m o where
-    TotalLossFunction :: { unTotErrF :: Vector m (Vector o Output) -> Vector m (Vector o Output) -> Output } -> TotalLossFunction m o
+    TotalLossFunction :: { unTotLossF :: Vector m (Vector o Output) -> Vector m (Vector o Output) -> Output } -> TotalLossFunction m o
 
 
 data Example i o where
