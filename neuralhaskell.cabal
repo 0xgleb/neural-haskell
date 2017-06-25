@@ -22,8 +22,10 @@ library
                      , Network.Classic
                      , Network.CommonTypes
                      , Network.Convolutional.Types
+                     , Network.Convolutional.Activation
                      , Network.Convolutional.Kernel
-                     , Network.Convolutional.Kernels
+                     , Network.Convolutional.Pool
+                     , Network.Convolutional.Network
                      , Network.Convolutional
   build-depends:       base >= 4.7 && < 5
                      , random
