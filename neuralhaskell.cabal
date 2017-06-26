@@ -18,6 +18,7 @@ library
                      , Network
                      , Network.Types
                      , Network.Neuron
+                     , Network.Neurons
   build-depends:       base >= 4.7 && < 5
                      , random
                      , vector-sized == 0.5.1.0

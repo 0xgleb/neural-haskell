@@ -4,6 +4,7 @@
 
 module Network.Neuron
 ( Neuron(..)
+, module Data.Vector.Sized
 , summation
 , activation
 , weights

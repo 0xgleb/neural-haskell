@@ -4,6 +4,7 @@
 
 module Network
 ( module Network.Neuron
+, module Network.Types
 , Network(..)
 , nonDiffSum
 , initNet
@@ -18,7 +19,6 @@ module Network
 
 import Prelude hiding ((!!), (++), head, tail, foldl, zipWith, map, sum, length, mapM)
 
-import Data.Vector.Sized
 import GHC.TypeLits
 
 import Control.Lens

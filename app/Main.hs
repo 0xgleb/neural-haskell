@@ -1,7 +1,6 @@
 {-# LANGUAGE DataKinds #-}
 
 import Prelude hiding ((!!), (++), head, tail, foldl, foldr, zipWith, map, sum)
-import Data.Vector.Sized hiding (replicateM)
 import GHC.TypeLits
 
 import System.Random
@@ -9,27 +8,14 @@ import Control.Monad
 import Control.Lens hiding (cons)
 
 import AutoDiff
-import Network.Types
-import Network
-
-summ :: Num a => Vector n (Dual a) -> (Dual a) -> Vector n a -> Dual a
-summ ws b a = (+ b) $ sum $ zipWith (*) ws $ map constDual a
-
-logistic :: Floating a => a -> a
-logistic x = 1 / (1 + exp (-x))
-
-logisticNeuron :: Weights n -> Bias -> Neuron n
-logisticNeuron = Neuron summ logistic
+import Network hiding (replicateM)
+import Network.Neurons
 
 linearNeuron :: Weights n -> Bias -> Neuron n
-linearNeuron = Neuron summ id
+linearNeuron = Neuron standartSum id
 
 testNet :: Network 2 2 1
-testNet = (cons (logisticNeuron (cons 0 $ singleton 0) 0)
-         $ cons (logisticNeuron (cons 0 $ singleton 0) 0)
-         $ cons (logisticNeuron (cons 0 $ singleton 0) 0)
-         $ cons (logisticNeuron (cons 0 $ singleton 0) 0)
-         $ empty) :~~ (cons (logisticNeuron (cons 0 $ cons 0 $ cons 0 $ cons 0 empty) 0) empty) :~~ NilNetwork
+testNet = (cons logisticNeuron $ cons logisticNeuron $ cons logisticNeuron $ cons logisticNeuron $ empty) :~~ singleton logisticNeuron :~~ NilNetwork
 
 examples :: Vector 4 (Example 2 1)
 examples = cons (Example (cons 0 $ cons 0 empty) (singleton 0))
