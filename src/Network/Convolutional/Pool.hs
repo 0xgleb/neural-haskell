@@ -1,6 +1,6 @@
 {-# LANGUAGE DataKinds, GADTs #-}
 {-# LANGUAGE TypeOperators #-}
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE RankNTypes #-}
 
 module Network.Convolutional.Pool where
 
@@ -11,4 +11,4 @@ import Control.Lens
 
 import Network.Convolutional.Types
 
-type Pool w h n m = DualImage (n * w) (m * h) -> DualImage w h
+type Pool w h n m = forall d. DualImage (n * w) (m * h) d -> DualImage w h d

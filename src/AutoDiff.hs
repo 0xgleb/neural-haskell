@@ -8,7 +8,7 @@ module AutoDiff
 , d
 , grad
 , imap
-, toNormalFunc
+, toNormalF
 ) where
 
 import Data.Vector.Sized
@@ -66,8 +66,8 @@ instance Ord a => Ord (Dual a) where
 d :: (Num a, Num c) => (Dual a -> Dual c) -> a -> c
 d f = \x -> diff . f $ Dual x 1
 
-toNormalFunc :: (Num a, Num b) => (Dual a -> Dual b) -> a -> b
-toNormalFunc f = val . f . constDual
+toNormalF :: (Num a, Num b) => (Dual a -> Dual b) -> a -> b
+toNormalF f = val . f . constDual
 
 grad :: Num a => (Vector n (Dual a) -> Dual a) -> Vector n a -> Vector n a
 grad f = \v -> imap (\i _ -> diff $ f $ toDualVector v i) v

@@ -12,12 +12,10 @@ import AutoDiff
 import Network.CommonTypes
 import Network.Convolutional.Types
 
-data Kernel w h where
-    Kernel :: { _summation :: DualWeights w h -> Dual Bias -> DualImage w h -> Dual Output
-              , _weights   :: Weights w h
+data Kernel w h d where
+    Kernel :: { _summation :: DualWeights w h d -> Dual Bias -> DualImage w h d -> Dual Output
+              , _weights   :: Weights w h d
               , _bias      :: Bias
-              } -> Kernel w h
+              } -> Kernel w h d
 
 makeLenses ''Kernel
-
--- runKernel :: Image 

@@ -48,7 +48,7 @@ initNet (layer :~~ netTail) = liftM2 (:~~) (mapM initNeuron layer) $ initNet net
 
 runNetwork :: Network i l o -> Vector i Input -> Vector o Output
 runNetwork NilNetwork          inputs = inputs
-runNetwork (layer :~~ netTail) inputs = runNetwork netTail $ map (\n -> (toNormalFunc $ n ^. activation) $ (nonDiffSum $ n ^. summation) (n ^. weights) (n ^. bias) inputs) layer
+runNetwork (layer :~~ netTail) inputs = runNetwork netTail $ map (\n -> (toNormalF $ n ^. activation) $ (nonDiffSum $ n ^. summation) (n ^. weights) (n ^. bias) inputs) layer
 
 doubleMap :: (a -> b -> c) -> Vector n a -> Vector n b -> Vector n c
 doubleMap f v1 v2 = map (uncurry f) $ zipWith (,) v1 v2
