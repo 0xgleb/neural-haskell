@@ -15,10 +15,15 @@ library
   hs-source-dirs:      src
   ghc-options:         -O2
   exposed-modules:     AutoDiff
-                     , Network
-                     , Network.Types
-                     , Network.Neuron
-                     , Network.Neurons
+                     , Network.Classic.Types
+                     , Network.Classic.Neuron
+                     , Network.Classic.Neurons
+                     , Network.Classic
+                     , Network.CommonTypes
+                     , Network.Convolutional.Types
+                     , Network.Convolutional.Kernel
+                     , Network.Convolutional.Kernels
+                     , Network.Convolutional
   build-depends:       base >= 4.7 && < 5
                      , random
                      , vector-sized == 0.5.1.0

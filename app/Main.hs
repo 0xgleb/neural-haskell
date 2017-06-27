@@ -8,11 +8,12 @@ import Control.Monad
 import Control.Lens hiding (cons)
 
 import AutoDiff
-import Network hiding (replicateM)
-import Network.Neurons
+import Network.CommonTypes
+import Network.Classic hiding (replicateM)
+import Network.Classic.Neurons
 
 testNet :: Network 2 2 1
-testNet = (cons logisticNeuron $ cons logisticNeuron $ cons logisticNeuron $ cons logisticNeuron $ empty) :~~ singleton logisticNeuron :~~ NilNetwork
+testNet = (cons sigmoidNeuron $ cons sigmoidNeuron $ cons sigmoidNeuron $ cons sigmoidNeuron $ empty) :~~ singleton sigmoidNeuron :~~ NilNetwork
 
 examples :: Vector 4 (Example 2 1)
 examples = cons (Example (cons 0 $ cons 0 empty) (singleton 0))

@@ -3,7 +3,7 @@
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE ConstraintKinds #-}
 
-module Network.Types where
+module Network.CommonTypes where
 
 import Data.Vector.Sized hiding ((++))
 import GHC.TypeLits
@@ -17,11 +17,9 @@ type NZ x x' = x ~ (x' + 1)
 type Number = Double
 
 type Bias          = Number
-type Weights     n = Vector n Number
-type DualWeights n = Vector n (Dual Number)
-type Activations n = Vector n Number
 type Input         = Number
 type Output        = Number
+
 type Error         = Number
 type Iterations    = Integer
 type LearningRate  = Number

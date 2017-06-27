@@ -1,14 +1,15 @@
 {-# LANGUAGE DataKinds #-}
 
-module Network.Neurons where
+module Network.Classic.Neurons where
 
 import Prelude hiding (sum, zipWith, map)
 import GHC.TypeLits
 
 import AutoDiff
 
-import Network.Neuron
-import Network.Types
+import Network.CommonTypes
+import Network.Classic.Neuron
+import Network.Classic.Types
 
 standartSum :: Num a => Vector n (Dual a) -> (Dual a) -> Vector n a -> Dual a
 standartSum ws b a = (+ b) $ sum $ zipWith (*) ws $ map constDual a
@@ -19,11 +20,11 @@ zeros = ($ 0) . ($ generate $ const 0)
 sigmoid :: Floating a => a -> a
 sigmoid x = 1 / (1 + exp (-x))
 
-newLogisticNeuron :: Vector n Number -> Number -> Neuron n
-newLogisticNeuron = Neuron standartSum sigmoid
+newSigmoidNeuron :: Vector n Number -> Number -> Neuron n
+newSigmoidNeuron = Neuron standartSum sigmoid
 
-logisticNeuron :: KnownNat n => Neuron n
-logisticNeuron = zeros newLogisticNeuron
+sigmoidNeuron :: KnownNat n => Neuron n
+sigmoidNeuron = zeros newSigmoidNeuron
 
 newLinearNeuron :: Weights n -> Bias -> Neuron n
 newLinearNeuron = Neuron standartSum id

@@ -2,7 +2,7 @@
 {-# LANGUAGE DataKinds, GADTs #-}
 {-# LANGUAGE TypeOperators #-}
 
-module Network.Neuron
+module Network.Classic.Neuron
 ( Neuron(..)
 , module Data.Vector.Sized
 , summation
@@ -25,8 +25,8 @@ import AutoDiff
 
 import System.Random (randomRIO)
 
-import Network.Types
-
+import Network.Classic.Types
+import Network.CommonTypes
 
 data Neuron n where
     Neuron :: { _summation  :: DualWeights n -> Dual Bias -> Activations n -> Dual Output

@@ -2,9 +2,9 @@
 {-# LANGUAGE DataKinds, GADTs #-}
 {-# LANGUAGE TypeOperators #-}
 
-module Network
-( module Network.Neuron
-, module Network.Types
+module Network.Classic
+( module Network.Classic.Neuron
+, module Network.Classic.Types
 , Network(..)
 , nonDiffSum
 , initNet
@@ -27,8 +27,9 @@ import Control.Monad (liftM2)
 import System.Random
 
 import AutoDiff
-import Network.Types
-import Network.Neuron
+import Network.CommonTypes
+import Network.Classic.Types
+import Network.Classic.Neuron
 
 
 infixr 5 :~~
