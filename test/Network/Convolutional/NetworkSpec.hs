@@ -34,12 +34,12 @@ spec = do
         it "holds on property unsafeTransposeV . unsafeTransposeV == id" $ do
             unsafeTransposeV (unsafeTransposeV regularImage) `shouldBe` regularImage
     describe "unsafeSplitVector" $ do
+        it "proxy2 proxy1 [1, 2, 3, 4, 5] == [[1, 2], [2, 3], [3, 4], [4, 5]], where proxy1 :: Proxy 1, proxy2 :: Proxy 2 and [..] are vectors" $ do
+            unsafeSplitVector proxy2 proxy1 (head regularImage) `shouldBe` cons (cons 11 $ singleton 12) (cons (cons 12 $ singleton 13) $ cons (cons 13 $ singleton 14) $ singleton $ cons 14 $ singleton 15)
         it "holds on property unsafeSplitVector proxy1 proxy1 == map singleton, where proxy1 :: Proxy 1" $ do
             unsafeSplitVector proxy1 proxy1 regularImage `shouldBe` map singleton regularImage
             unsafeSplitVector proxy1 proxy1 (head regularImage) `shouldBe` map singleton (head regularImage)
             unsafeSplitVector proxy1 proxy1 (last regularImage) `shouldBe` map singleton (last regularImage)
-        it "proxy2 proxy1 [1, 2, 3, 4, 5] == [[1, 2], [2, 3], [3, 4], [4, 5]], where proxy1 :: Proxy 1, proxy2 :: Proxy 2 and [..] are vectors" $ do
-            unsafeSplitVector proxy2 proxy1 (head regularImage) `shouldBe` cons (cons 11 $ singleton 12) (cons (cons 12 $ singleton 13) $ cons (cons 13 $ singleton 14) $ singleton $ cons 14 $ singleton 15)
 
 main :: IO ()
 main = hspec spec
