@@ -9,6 +9,8 @@ import GHC.TypeLits
 
 import Control.Lens
 
+import AutoDiff
+import Network.CommonTypes
 import Network.Convolutional.Types
 
-type Pool w h n m = forall d. DualImage (n * w) (m * h) d -> DualImage w h d
+type Pool w h = Vector h (Vector w (Dual Number)) -> Dual Number
