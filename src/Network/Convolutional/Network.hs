@@ -40,9 +40,9 @@ unsafeUnMaybe :: Maybe a -> a
 unsafeUnMaybe (Just x) = x
 
 unsafeTransposeV :: (KN m, NZ m m', KN n, NZ n n') => Vector n (Vector m a) -> Vector m (Vector n a)
-unsafeTransposeV vector = unsafeUnMaybe $ toSized $ takeRightElements $ sequence $ fmap fromSized vector
-    where takeRightElements :: Vec.Vector (Vector n a) -> Vec.Vector (Vector n a)
-          takeRightElements v = if Vec.length v == 0 then Vec.empty else Vec.cons (Vec.head v) $ takeRightElements $ Vec.drop (length (head vector) ^ length vector `div` (length (head vector) - 1)) v
+unsafeTransposeV vector = unsafeUnMaybe $ toSized $ fmap (unsafeUnMaybe . toSized) $ unsizedTranspose $ fmap fromSized $ fromSized vector
+    where unsizedTranspose :: Vec.Vector (Vec.Vector a) -> Vec.Vector (Vec.Vector a)
+          unsizedTranspose v = if Vec.length v == 0 then Vec.empty else if Vec.length (Vec.head v) == 0 then Vec.empty else Vec.cons (fmap Vec.head v) $ unsizedTranspose (Vec.map Vec.tail v)
 
 
 unsafeSplitVector :: (KN kl, KN s, KN (l + 1)) => Proxy kl -> Proxy s -> Vector ((l * s) + kl) a -> Vector (l + 1) (Vector kl a)
