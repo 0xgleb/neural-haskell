@@ -15,6 +15,6 @@ import Network.Convolutional.Types
 data Kernel w h d where
     Kernel :: (NZ w w', NZ h h', NZ d d') =>
         { summation :: DualWeights w h d -> Dual Bias -> DualImage w h d -> Dual Output
-        , weights   :: Weights w h d
         , bias      :: Bias
+        , weights   :: Weights w h d
         } -> Kernel w h d
