@@ -7,7 +7,7 @@ module Network.Convolutional.NetworkSpec where
 import Test.Hspec
 import Test.QuickCheck
 
-import Prelude hiding (map, zipWith, head, last, (++), replicate, maximum)
+import Prelude hiding (sum, map, zipWith, head, last, (++), replicate, maximum)
 import GHC.TypeLits
 import Data.Proxy
 import Data.Vector.Sized
@@ -16,6 +16,7 @@ import AutoDiff
 import Network.CommonTypes
 import Network.Convolutional.Types
 import Network.Convolutional.Pool
+import Network.Convolutional.Kernel
 import Network.Convolutional.Network
 
 regularImage :: Vector 5 (Vector 5 Number)
@@ -76,6 +77,21 @@ sampleAfterPooling =
          )
   $ empty
 
+kernel :: Kernel 2 2 3
+kernel = Kernel { summation = \ws b i -> (+ b) $ sum $ fmap (sum . fmap sum) $ zipWith (zipWith $ zipWith (*)) ws i
+                , weights   = replicate $ replicate $ replicate 1
+                , bias      = 0
+                }
+
+sampleAfterConv :: Image 4 4 1
+sampleAfterConv =
+    cons ( cons (cons 2598 $ cons 2610 $ cons 2622 $ cons 2634 empty)
+         $ cons (cons 2718 $ cons 2730 $ cons 2742 $ cons 2754 empty)
+         $ cons (cons 2838 $ cons 2850 $ cons 2862 $ cons 2874 empty)
+         $ cons (cons 2958 $ cons 2970 $ cons 2982 $ cons 2994 empty)
+         $ empty
+         ) empty
+
 spec :: Spec
 spec = do
     describe "unsafeTransposeV" $ do
@@ -92,12 +108,14 @@ spec = do
         it "holds on property runNetwork NilNet == id" $ do
             runNetwork NilNet (singleton regularImage) `shouldBe` singleton regularImage
             runNetwork NilNet sampleInput `shouldBe` sampleInput
-        it "can work with an activation layer" $ do
+        it "works with an activation layer" $ do
             runNetwork (ActivL ((+1) . (*2)) NilNet) sampleInput `shouldBe` fmap (fmap $ fmap $ toNormalF ((+1) . (*2))) sampleInput
         it "can apply padding to an image" $ do
             runNetwork (Pad proxy1 proxy1 NilNet) sampleInput `shouldBe` fmap (\vec -> singleton (replicate' (Proxy :: Proxy 7) 0) ++ fmap (\v -> cons 0 $ snoc v 0) vec ++ singleton (replicate' (Proxy :: Proxy 7) 0)) sampleInput
-        it "can work with pooling layers" $ do
+        it "works with pooling layers" $ do
             runNetwork (PoolL myMax proxy2 proxy2 NilNet) sampleInput `shouldBe` sampleAfterPooling
+        it "works with convolutional layers" $ do
+            runNetwork (ConvL (singleton kernel) proxy1 proxy1 NilNet) sampleInput `shouldBe` sampleAfterConv
 
 main :: IO ()
 main = hspec spec

@@ -39,7 +39,7 @@ poolToProxy _ = (Proxy, Proxy)
 unsafeUnMaybe :: Maybe a -> a
 unsafeUnMaybe (Just x) = x
 
-unsafeTransposeV :: (KN m, NZ m m', KN n, NZ n n') => Vector n (Vector m a) -> Vector m (Vector n a)
+unsafeTransposeV :: (KN m, KN n, NZ n n') => Vector n (Vector m a) -> Vector m (Vector n a)
 unsafeTransposeV vector = unsafeUnMaybe $ toSized $ fmap (unsafeUnMaybe . toSized) $ unsizedTranspose $ fmap fromSized $ fromSized vector
     where unsizedTranspose :: Vec.Vector (Vec.Vector a) -> Vec.Vector (Vec.Vector a)
           unsizedTranspose v = if Vec.length v == 0 then Vec.empty else if Vec.length (Vec.head v) == 0 then Vec.empty else Vec.cons (fmap Vec.head v) $ unsizedTranspose (Vec.map Vec.tail v)
