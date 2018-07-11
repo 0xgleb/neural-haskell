@@ -1,12 +1,12 @@
 module Network.Classic.Types where
 
-import Network.CommonTypes
-import AutoDiff
+import           AutoDiff
+import           Network.CommonTypes
 
-import Data.Vector.Sized
-import GHC.TypeLits
+import           Data.Vector.Sized
+import           GHC.TypeLits
 
-import Control.Lens
+import           Control.Lens
 
 type Weights     n = Vector n Number
 type DualWeights n = Vector n (Dual Number)

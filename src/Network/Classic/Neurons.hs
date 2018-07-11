@@ -2,20 +2,19 @@
 
 module Network.Classic.Neurons where
 
-import Prelude hiding (sum, zipWith, map)
-import GHC.TypeLits
+import           GHC.TypeLits
+import           Prelude                hiding (sum, zipWith)
 
-import AutoDiff
-
-import Network.CommonTypes
-import Network.Classic.Neuron
-import Network.Classic.Types
+import           AutoDiff
+import           Network.Classic.Neuron
+import           Network.Classic.Types
+import           Network.CommonTypes
 
 standartSum :: Num a => Vector n (Dual a) -> (Dual a) -> Vector n a -> Dual a
-standartSum ws b a = (+ b) $ sum $ zipWith (*) ws $ map constDual a
+standartSum ws b a = (+ b) $ sum $ zipWith (*) ws $ constDual <$> a
 
 zeros :: KnownNat n => (Weights n -> Bias -> Neuron n) -> Neuron n
-zeros = ($ 0) . ($ generate $ const 0)
+zeros f = f (generate $ const 0) 0
 
 sigmoid :: Floating a => a -> a
 sigmoid x = 1 / (1 + exp (-x))
@@ -30,7 +29,7 @@ newLinearNeuron :: Weights n -> Bias -> Neuron n
 newLinearNeuron = Neuron standartSum id
 
 linearNeuron :: KnownNat n => Neuron n
-linearNeuron = zeros newLinearNeuron 
+linearNeuron = zeros newLinearNeuron
 
 newTanhNeuron :: Weights n -> Bias -> Neuron n
 newTanhNeuron = Neuron standartSum tanh

@@ -1,12 +1,13 @@
-{-# LANGUAGE DataKinds, TypeOperators #-}
+{-# LANGUAGE DataKinds     #-}
+{-# LANGUAGE TypeOperators #-}
 
 module Network.Convolutional.Types where
 
-import Network.CommonTypes
-import AutoDiff
+import           AutoDiff
+import           Network.CommonTypes
 
-import Data.Vector.Sized
-import GHC.TypeLits
+import           Data.Vector.Sized
+import           GHC.TypeLits
 
 type Image       w h d = Vector d (Vector h (Vector w Number))
 type DualImage   w h d = Vector d (Vector h (Vector w (Dual Number)))
